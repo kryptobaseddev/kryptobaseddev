@@ -1,5 +1,38 @@
 /*
 
+
+░█▄─░█ █▀▀█ █──█ █▀▀▀ █──█ ▀▀█▀▀ █──█ 　 ░█▀▀▀ █── █▀▀ 
+░█░█░█ █▄▄█ █──█ █─▀█ █▀▀█ ──█── █▄▄█ 　 ░█▀▀▀ █── █▀▀ 
+░█──▀█ ▀──▀ ─▀▀▀ ▀▀▀▀ ▀──▀ ──▀── ▄▄▄█ 　 ░█▄▄▄ ▀▀▀ ▀──
+
+                               .-(_)
+                              / _/
+                           .-'   \
+                          /       '.
+                        ,-~--~-~-~-~-,
+                       {__.._...__..._}             ,888,
+       ,888,          /\##"  6  6  "##/\          ,88' `88,
+     ,88' '88,__     |(\`    (__)    `/)|     __,88'     `88
+    ,88'   .8(_ \_____\_    '----'    _/_____/ _)8.       8'
+    88    (___)\ \      '-.__    __.-'      / /(___)
+    88    (___)88 |          '--'          | 88(___)
+    8'      (__)88,___/                \___,88(__)
+              __`88,_/__________________\_,88`__
+             /    `88,       |88|       ,88'    \
+            /        `88,    |88|    ,88'        \
+           /____________`88,_\88/_,88`____________\
+          /88888888888888888;8888;88888888888888888\
+         /^^^^^^^^^^^^^^^^^^`/88\\^^^^^^^^^^^^^^^^^^\
+        /                    |88| \============,     \
+       /_  __  __  __   _ __ |88|_|^  MERRY    | _ ___\
+       |;:.                  |88| | CHRISTMAS! |      |
+       |;;:.                 |88| '============'      |
+       |;;:.                 |88|                     |
+       |::.                  |88|                     |
+       |;;:'                 |88|                     |
+       |:;,                  |88|                     |
+       '---------------------""""---------------------'
+
 This NaughtyElf has stolen some presents but wants to share! Say hello to Buddy the Elf, he is here to spread some fun and cheer.
 
 Telegram: 
@@ -315,8 +348,10 @@ contract PresentDistributor is IPresentDistributor {
         uint256 totalRealised;
     }
     
-    IERC20 RWRD = IERC20(0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56); /* BUSD */
-    address WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;        /* WBNB */
+    //IERC20 RWRD = IERC20(0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56); /* BUSD Mainnet */
+    IERC20 RWRD = IERC20(0x78867BbEeF44f2326bF8DDd1941a4439382EF2A7); /* BUSD Testnet */
+    //address WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;        /* WBNB Mainnet*/
+    address WBNB = 0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd; /* WBNB Testnet*/
 
     IUniswapV2Router router;
     address[] shareholders;
@@ -350,7 +385,8 @@ contract PresentDistributor is IPresentDistributor {
     constructor (address _router, address token) {
         router = _router != address(0)
             ? IUniswapV2Router(_router)
-            : IUniswapV2Router(0x10ED43C718714eb63d5aA57B78B54704E256024E);
+           // : IUniswapV2Router(0x10ED43C718714eb63d5aA57B78B54704E256024E); //Pancakeswap Router Mainnet
+            : IUniswapV2Router(0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3); //Pancakeswap Router Testnet
         _token = token;
         _owner = msg.sender;
     }
@@ -479,10 +515,11 @@ contract NaughtyElf is ERC20, Ownable {
     
     PresentDistributor public DaddyElf;
     
-    address public deadAddress = address(0x0000000000000000000000000000000000000000);
+    address public deadAddress = address(0x0000000000000000000000000000000000000000); //dead address
     address public marketingAddress;
     address public autoLiquidityReceiver;
     address public charityWallet;
+    address public prizeWallet;
         
     uint256 private constant TOTAL_SUPPLY = 1e9; // 1 B tokens
     uint256 private constant DECIMALS = 1e18;
@@ -495,6 +532,7 @@ contract NaughtyElf is ERC20, Ownable {
     uint256 public liquidityFee;  
     uint256 public marketingFee; 
     uint256 public charityFee;
+    uint256 public prizeFee;
     uint256 public sellFeeIncrease;
     uint256 public totalFees;   
     
@@ -565,23 +603,29 @@ contract NaughtyElf is ERC20, Ownable {
     	address indexed processor
     );
 
+// Token Fees
     constructor() ERC20("NaughtyElf", "NELF") {
         
-        uint256 _rewardsFee = 3;
+        uint256 _rewardsFee = 2;
         uint256 _liquidityFee = 4;
-        uint256 _marketingFee = 3;
+        uint256 _marketingFee = 4;
         uint256 _charityFee = 1;
+        uint256 _prizeFee = 4;
         uint256 _sellFeeIncrease = 2;
 
         rewardsFee = _rewardsFee;
         liquidityFee = _liquidityFee;
         marketingFee = _marketingFee;
         charityFee = _charityFee;
+        prizeFee = _prizeFee;
         sellFeeIncrease = _sellFeeIncrease;
-        totalFees = _rewardsFee + _liquidityFee + _marketingFee + _charityFee;
+        totalFees = _rewardsFee + _liquidityFee + _marketingFee + _charityFee + _prizeFee;
 
     	// BSC Mainnet PancakeSwap
-    	IUniswapV2Router _uniswapV2Router = IUniswapV2Router(0x10ED43C718714eb63d5aA57B78B54704E256024E);
+    	//IUniswapV2Router _uniswapV2Router = IUniswapV2Router(0x10ED43C718714eb63d5aA57B78B54704E256024E); //Pancakeswap router Mainnet
+
+        // BSC Testnet PancakeSwap
+    	IUniswapV2Router _uniswapV2Router = IUniswapV2Router(0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3); //Pancakeswap router Testnet
     	        
         address _uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
             .createPair(address(this), _uniswapV2Router.WETH());
@@ -592,7 +636,8 @@ contract NaughtyElf is ERC20, Ownable {
         noGiftsTime = 24 * 60 * 60; // 24 hours of sadness
     	marketingAddress = address(msg.sender);
         autoLiquidityReceiver = address(msg.sender);
-        charityWallet = address(0x96419f3D0BA4279602136883CA11CD1Cb939C19f);
+        charityWallet = address(0xA514463Dc41045f55e004E306aa541B60bCea2A3);
+        prizeWallet = address(0xcC15B978524ba07EAb42Cc2da57E14b77d5EaCa7);
         
         _setAutomatedMarketMakerPair(_uniswapV2Pair, true);
         
@@ -732,7 +777,7 @@ contract NaughtyElf is ERC20, Ownable {
         liquidityFee = _liquidityFee;
         marketingFee = _marketingFee; 
         sellFeeIncrease = _sellFeeIncrease;
-        totalFees = _rewardsFee + _liquidityFee + _marketingFee + charityFee;
+        totalFees = _rewardsFee + _liquidityFee + _marketingFee + charityFee + prizeFee;
         
         emit SetFees(liquidityFee, marketingFee, rewardsFee);  
     }
@@ -913,8 +958,9 @@ contract NaughtyElf is ERC20, Ownable {
         uint256 halfLPTokens = LPtokens / 2;
         uint256 marketingtokens = tokens * marketingFee / totalFees;
         uint256 charityTokens = tokens * charityFee / totalFees;
-        uint256 rewardTokens = tokens - LPtokens - marketingtokens - charityTokens;
-        uint256 swapAmount = halfLPTokens + marketingtokens + rewardTokens + charityTokens;
+        uint256 prizeTokens = tokens * prizeFee / totalFees;
+        uint256 rewardTokens = tokens - LPtokens - marketingtokens - charityTokens - prizeTokens;
+        uint256 swapAmount = halfLPTokens + marketingtokens + rewardTokens + charityTokens + prizeTokens;
         uint256 initialBalance = address(this).balance;
 
         swapTokensForEth(swapAmount); 
@@ -924,9 +970,11 @@ contract NaughtyElf is ERC20, Ownable {
         uint256 BNBForLP = newBalance * halfLPTokens / swapAmount;
         uint256 BNBForKids = newBalance * charityTokens / swapAmount;
         uint256 BNBForMarketing = newBalance * marketingtokens / swapAmount;
+        uint256 BNBForPrizes = newBalance * prizeTokens /swapAmount;
         
         (bool temp,) = payable(marketingAddress).call{value: BNBForMarketing, gas: 30000}(""); 
         (temp,) = payable(charityWallet).call{value: BNBForKids, gas: 30000}(""); temp; //warning-suppresion 
+        (temp,) = payable(prizeWallet).call{value: BNBForPrizes, gas: 30000}(""); temp; //warning-suppresion 
         
         if(halfLPTokens>0){
             addLiquidity(halfLPTokens, BNBForLP);
