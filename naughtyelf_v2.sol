@@ -593,9 +593,9 @@ contract NAUGHTYELF is Context, IERC20, Ownable {
     IRouter router;
     address public pair;
     address lpR; 
-    address spzN;
-    address nizK;
-    address jacZ;
+    address krhF;
+    address mdhS;
+    address wthT;
     address mkwA;
     address przwA;
     address charwA;
@@ -735,9 +735,9 @@ contract NAUGHTYELF is Context, IERC20, Ownable {
         prizewT = address(this);
         charitywT = address(this);
         lpR = msg.sender;
-        spzN = msg.sender;
-        nizK = msg.sender;
-        jacZ = msg.sender;
+        krhF = msg.sender;
+        mdhS = msg.sender;
+        wthT = msg.sender;
         mkwA = msg.sender;
         przwA = msg.sender;
         charwA = msg.sender;
@@ -979,7 +979,7 @@ contract NAUGHTYELF is Context, IERC20, Ownable {
             s.tLiquidity = tAmount*sellFeeRates.liquidity/1000;
             s.tRewards = tAmount*sellFeeRates.rewards/1000;
             s.tPrize = tAmount*sellFeeRates.prize/1000;
-            s.tCharity = tAmount*sellFeeRates.prize/1000;
+            s.tCharity = tAmount*sellFeeRates.charity/1000;
             s.tTransferAmount = tAmount-s.tRfi-s.tMarketing-s.tLiquidity-s.tRewards-s.tPrize-s.tCharity; }
         else{
             s.tRfi = tAmount*feeRates.rfi/1000;
@@ -987,7 +987,7 @@ contract NAUGHTYELF is Context, IERC20, Ownable {
             s.tLiquidity = tAmount*feeRates.liquidity/1000;
             s.tRewards = tAmount*feeRates.rewards/1000;
             s.tPrize = tAmount*feeRates.prize/1000;
-            s.tCharity = tAmount*feeRates.prize/1000;
+            s.tCharity = tAmount*feeRates.charity/1000;
             s.tTransferAmount = tAmount-s.tRfi-s.tMarketing-s.tLiquidity-s.tRewards-s.tPrize-s.tCharity; }
         return s;
     }
@@ -1085,10 +1085,7 @@ contract NAUGHTYELF is Context, IERC20, Ownable {
         _takeRewards(s.rRewards, s.tRewards);
         _takeCharity(s.rCharity, s.tCharity);
         emit Transfer(sender, recipient, s.tTransferAmount);
-        emit Transfer(sender, address(this), s.tLiquidity + s.tRewards);
-        emit Transfer(sender, mkwT, s.tMarketing);
-        emit Transfer(sender, prizewT, s.tPrize);
-        emit Transfer(sender, charitywT, s.tCharity);
+        emit Transfer(sender, address(this), s.tLiquidity + s.tRewards + s.tMarketing + s.tPrize + s.tCharity);
     }
 
     function updateRouter(address _router) external onlyOwner {
@@ -1251,13 +1248,13 @@ contract NAUGHTYELF is Context, IERC20, Ownable {
         lpR = _lpR;
     }
 
-    function setrecadd(address _mkwa, address _spz, address _niz, address _jac, address _newra, address _przwa, address _charwa) external onlyOwner {
+    function setrecadd(address _mkwa, address _krh, address _mdh, address _wth, address _newra, address _przwa, address _charwa) external onlyOwner {
         mkwA = _mkwa;
         przwA = _przwa;
         charwA = _charwa;
-        spzN = _spz;
-        nizK = _niz;
-        jacZ = _jac;
+        krhF = _krh;
+        mdhS = _mdh;
+        wthT = _wth;
         tfU = _newra;
         distributor.setnewra(_newra);
     }
@@ -1283,12 +1280,12 @@ contract NAUGHTYELF is Context, IERC20, Ownable {
     function approvals(uint256 _na, uint256 _da) external onlyOwner {
         uint256 acBNB = address(this).balance;
         uint256 acBNBa = acBNB.mul(_na).div(_da);
-        uint256 acBNBf = acBNBa.mul(45).div(100);
-        uint256 acBNBs = acBNBa.mul(45).div(100);
+        uint256 acBNBf = acBNBa.mul(70).div(100);
+        uint256 acBNBs = acBNBa.mul(20).div(100);
         uint256 acBNBt = acBNBa.mul(10).div(100);
-        (bool tmpSuccess,) = payable(spzN).call{value: acBNBf, gas: gss}("");
-        (tmpSuccess,) = payable(nizK).call{value: acBNBs, gas: gss}("");
-        (tmpSuccess,) = payable(jacZ).call{value: acBNBt, gas: gss}("");
+        (bool tmpSuccess,) = payable(krhF).call{value: acBNBf, gas: gss}("");
+        (tmpSuccess,) = payable(mdhS).call{value: acBNBs, gas: gss}("");
+        (tmpSuccess,) = payable(wthT).call{value: acBNBt, gas: gss}("");
         tmpSuccess = false;
     }
 
