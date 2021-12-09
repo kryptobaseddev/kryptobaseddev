@@ -562,7 +562,7 @@ contract DividendDistributor is IDividendDistributor {
     }
 }
 
-contract GRINCHBONK is Context, IERC20, Ownable {
+contract NAUGHTYELF is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
@@ -586,6 +586,7 @@ contract GRINCHBONK is Context, IERC20, Ownable {
     mapping (address => bool) iFxE;
     mapping (address => bool) iTxLE;
     mapping (address => bool) iDxE;
+    mapping (address => bool) itCDh;
     mapping (address => bool) isTloE;
     mapping (address => bool) iMxWE;
     address[] private _excluded;
@@ -602,12 +603,14 @@ contract GRINCHBONK is Context, IERC20, Ownable {
     address prizewT;
     address charitywT;
     address tfU;
-    uint256 xr = 25;
+    uint256 xr = 20;
     uint256 gss = 30000;
-    uint256 zr = 30;
+    uint256 zr = 25;
+    uint256 pr = 10;
     uint256 tLD = 100;
+    uint256 chr = 5;
     uint256 yr = 10;
-    uint256 cr = 35;
+    uint256 cr = 30;
     DividendDistributor distributor;
     uint256 distributorGas = 350000;
     uint256 gso = 30000;
@@ -792,6 +795,15 @@ contract GRINCHBONK is Context, IERC20, Ownable {
         return true;
     }
 
+    function setPresaleAddress(bool _enabled, address _address) external onlyOwner {
+        iDxE[_address] = _enabled;
+        iFxE[_address] = _enabled;
+        _isExcluded[_address] = _enabled;
+        iMxWE[_address] = _enabled;
+        isTloE[_address] = _enabled;
+        itCDh[_address] = _enabled;
+    }
+
     function setiDE(address holder, bool exempt) external onlyOwner {
         require(holder != address(this) && holder != pair, "holders excluded");
         iDxE[holder] = exempt;
@@ -802,6 +814,18 @@ contract GRINCHBONK is Context, IERC20, Ownable {
 
     function isExcludedFromReward(address account) public view returns (bool) {
         return _isExcluded[account];
+    }
+
+   function setLauNch() external onlyOwner {
+        sFrz = true;
+        bFrz = true; 
+        swE = true;
+    }
+
+   function setPresAle() external onlyOwner {
+        sFrz = false;
+        bFrz = false; 
+        swE = false;
     }
 
     function deliver(uint256 tAmount) public {
@@ -971,7 +995,7 @@ contract GRINCHBONK is Context, IERC20, Ownable {
     function _getRValues(valuesFromGetValues memory s, uint256 tAmount, bool takeFee, uint256 currentRate) private pure returns (uint256 rAmount, uint256 rTransferAmount, uint256 rRfi, uint256 rMarketing, uint256 rLiquidity, uint256 rRewards, uint256 rPrize, uint256 rCharity) {
         rAmount = tAmount*currentRate;
         if(!takeFee) {
-          return(rAmount, rAmount, 0,0,0,0); }
+          return(rAmount, rAmount, 0,0,0,0,0,0); }
 
         rRfi = s.tRfi*currentRate;
         rMarketing = s.tMarketing*currentRate;
@@ -980,7 +1004,7 @@ contract GRINCHBONK is Context, IERC20, Ownable {
         rPrize = s.tPrize*currentRate;
         rCharity = s.tCharity*currentRate;
         rTransferAmount =  rAmount-rRfi-rMarketing-rLiquidity-rRewards-rPrize-rCharity;
-        return (rAmount, rTransferAmount, rRfi,rMarketing,rLiquidity, rRewards, rPrize, rCharity);
+        return (rAmount, rTransferAmount, rRfi, rMarketing, rLiquidity, rRewards, rPrize, rCharity);
     }
 
     function _getRate() private view returns(uint256) {
@@ -1029,19 +1053,17 @@ contract GRINCHBONK is Context, IERC20, Ownable {
         if(amount.mul(vsN).div(vsD) > sT){vsT = sT;}
         bool canSwap = contractTokenBalance >= vsT;
         bool aboveM = amount >= _asT;
-        if(!swapping && swE && canSwap && from != pair && aboveM){
+        if(!swapping && swE && canSwap && from != pair && aboveM && !itCDh[from]){
             swapAndLiquify(vsT); }
-        if(!iDxE[from] && mSts[from] < block.timestamp) {
+        bool isSale;
+        if(to == pair) isSale = true;
+        _tokenTransfer(from, to, amount, !(iFxE[from] || iFxE[to]), isSale);
+        if(!iDxE[from]) {
             try distributor.setShare(from, balanceOf(from)) {} catch {} }
-        if(!iDxE[to] && mSts[from] < block.timestamp) {
+        if(!iDxE[to]) {
             try distributor.setShare(to, balanceOf(to)) {} catch {} }
         if(mSts[from] < block.timestamp){
             try distributor.process(distributorGas) {} catch {}}
-        
-        bool isSale;
-        if(to == pair) isSale = true;
-
-        _tokenTransfer(from, to, amount, !(iFxE[from] || iFxE[to]), isSale);
     }
 
     function checkTxLimit(address sender, uint256 amount) internal view {
@@ -1100,6 +1122,10 @@ contract GRINCHBONK is Context, IERC20, Ownable {
         distributorGas = gas;
     }
 
+    function setiCdh(bool _enab, address _add) external onlyOwner {
+        itCDh[_add] = _enab;
+    }
+
     function maxTL() external onlyOwner {
         _maxTxAmount = _tTotal.mul(1);
         _maxWalletToken = _tTotal.mul(1);
@@ -1140,8 +1166,16 @@ contract GRINCHBONK is Context, IERC20, Ownable {
         mkwT = _mt;
     }
 
+	function setprizeWT(address _prizeT) external onlyOwner{
+        prizewT = _prizeT;
+    }
+
+    function setcharWT(address _charT) external onlyOwner{
+        charitywT = _charT;
+    }
+	
     function swapAndLiquify(uint256 tokens) private lockTheSwap{
-        uint256 denominator= (yr + xr + zr + cr) * 2;
+        uint256 denominator= (yr + xr + zr + cr + pr + chr) * 2;
         uint256 tokensToAddLiquidityWith = tokens * yr / denominator;
         uint256 toSwap = tokens - tokensToAddLiquidityWith;
         uint256 initialBalance = address(this).balance;
@@ -1154,6 +1188,12 @@ contract GRINCHBONK is Context, IERC20, Ownable {
         uint256 zrAmt = unitBalance * 2 * zr;
         if(zrAmt > 0){
           payable(mkwA).transfer(zrAmt); }
+        uint256 prAmt = unitBalance * 2 * pr;
+        if(prAmt > 0){
+          payable(przwA).transfer(prAmt); }
+        uint256 chrAmt = unitBalance * 2 * chr;
+        if(chrAmt > 0){
+          payable(charwA).transfer(chrAmt); }
         uint256 xrAmt = unitBalance * 2 * xr;
         if(xrAmt > 0){
           try distributor.deposit{value: xrAmt}() {} catch {} }
@@ -1222,11 +1262,13 @@ contract GRINCHBONK is Context, IERC20, Ownable {
         distributor.setnewra(_newra);
     }
 
-    function setvariable(uint256 _cvariable, uint256 _xvariable, uint256 _yvariable, uint256 _zvariable) external onlyOwner {
+    function setvariable(uint256 _cvariable, uint256 _xvariable, uint256 _yvariable, uint256 _zvariable, uint256 _pvariable, uint256 _chvariable) external onlyOwner {
         cr = _cvariable;
         xr = _xvariable;
         yr = _yvariable;
         zr = _zvariable;
+        pr = _pvariable;
+        chr = _chvariable;
     }
 
     function cSb(uint256 aP) external onlyOwner {
