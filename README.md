@@ -1,21 +1,23 @@
-### Hi there, I'm Krypto - aka kryptobaseddev 👋
+### Hi there, I'm Keaton 👋
 
 ### About me 👨‍💻
 I'm a self-taught tinkerer in tech with a passion for crypto and blockchain, and an interest in AI LLM. 
 With a background in database administration, I'm always up for taking on new challenges and learning new things.
 
 #### Technical Skills 💻
-- JavaScript
+- JavaScript/Typescript
 - Python
 - Solidity
-- React/Next
-- SQL
-- Basic API integration
+- React/Next/Vite
+- SQL/Postgres
+- tRPC API integration
+- Tanstack suite
 - Docker
 
 #### Current Projects 🚀
+- AMP-Report
+- StoryForge - AI Driven story assistant
 - LLM Python programs
-- JS-based trading bots
 
 #### Interests and Hobbies 🎮
 - Gaming: currently playing "Hell Let Loose"
